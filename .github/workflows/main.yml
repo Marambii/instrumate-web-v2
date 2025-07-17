@@ -37,6 +37,11 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
             
+      - name: Validate SSH key format
+        run: |
+          file ~/.ssh/id_ed25519
+          head -n 5 ~/.ssh/id_ed25519
+          ssh-keygen -l -f ~/.ssh/id_ed25519 || echo "INVALID KEY"
 
       - name: Set up SSH
         run: |
