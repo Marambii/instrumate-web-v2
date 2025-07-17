@@ -37,10 +37,6 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
             
-      - name: Debug key
-        run: |
-          ls -l ~/.ssh
-          ssh -vvv -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_BOT }}@${{ secrets.SERVER_IP }} true
 
       - name: Set up SSH
         run: |
@@ -48,6 +44,13 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+      - name: Confirm SSH key exists
+        run: |
+          ls -l ~/.ssh
+          cat ~/.ssh/id_ed25519
+
+
 
       - name: Deploy to production server
         run: |
