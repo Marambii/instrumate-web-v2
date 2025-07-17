@@ -36,6 +36,11 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
             ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+            
+      - name: Debug key
+        run: |
+          ls -l ~/.ssh
+          ssh -vvv -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_BOT }}@${{ secrets.SERVER_IP }} true
 
       - name: Set up SSH
         run: |
