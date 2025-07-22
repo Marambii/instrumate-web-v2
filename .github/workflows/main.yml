@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+  # schedule:
+  #   - cron: '0 0 0 * *' # Uncomment to schedule the workflow
+
   pull_request:
     branches:
       - main
@@ -33,30 +36,15 @@ jobs:
         with:
           context: ./
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
-            
-      - name: Validate SSH key format
-        run: |
-          file ~/.ssh/id_ed25519
-          head -n 5 ~/.ssh/id_ed25519
-          ssh-keygen -l -f ~/.ssh/id_ed25519 || echo "INVALID KEY"
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}, ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
 
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          
-      - name: Confirm SSH key exists
-        run: |
-          ls -l ~/.ssh
-          cat ~/.ssh/id_ed25519
-
-
+          ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Deploy to production server
-        run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_BOT }}@${{ secrets.SERVER_IP }} "~/deploy.sh"
+        run:
+          ssh ${{ secrets.SERVER_BOT }}@${{ secrets.SERVER_IP }} "~/deploy.sh"
